@@ -3,6 +3,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Container } from "@/components/common/Container"
 import { SectionHeading } from "@/components/common/SectionHeading"
 import { TripCard } from "@/components/cards/TripCard"
+import { TripCardStack } from "@/components/cards/TripCardStack"
 import { Button } from "@/components/ui/button"
 import { trips } from "@/constants/trips"
 
@@ -116,9 +117,13 @@ export function TrendingTripsSection() {
           </div>
         </div>
 
+        <div className="sm:hidden">
+          <TripCardStack trips={trips} />
+        </div>
+
         <div
           ref={scrollerRef}
-          className="scrollbar-none flex snap-x snap-mandatory gap-6 overflow-x-auto overflow-y-hidden py-4"
+          className="scrollbar-none hidden snap-x snap-mandatory gap-6 overflow-x-auto overflow-y-hidden py-4 sm:flex"
         >
           {trips.map((trip, index) => (
             <div
@@ -126,7 +131,7 @@ export function TrendingTripsSection() {
               ref={(el) => {
                 cardRefs.current[index] = el
               }}
-              className="w-[82%] shrink-0 snap-start transition-[transform,opacity] duration-200 ease-out sm:w-[46%] lg:w-[31%] xl:w-[27%]"
+              className="w-[46%] shrink-0 snap-start transition-[transform,opacity] duration-200 ease-out lg:w-[31%] xl:w-[27%]"
             >
               <TripCard trip={trip} />
             </div>
