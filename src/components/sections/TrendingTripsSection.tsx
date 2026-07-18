@@ -8,6 +8,7 @@ import { trips } from "@/constants/trips"
 
 export function TrendingTripsSection() {
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
   function scrollByAmount(direction: 1 | -1) {
     const el = scrollerRef.current
@@ -33,6 +34,52 @@ export function TrendingTripsSection() {
 
     el.addEventListener("wheel", onWheel, { passive: false })
     return () => el.removeEventListener("wheel", onWheel)
+  }, [])
+
+  useEffect(() => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+
+    let rafId = 0
+
+    // Stacked-carousel look: the card nearest the container's center sits
+    // forward at full scale/opacity; cards further to either side recede —
+    // scaled down, dimmed, and pushed back — proportional to their distance
+    // from center. Symmetric on both sides, works for any card count.
+    function updateCardTransforms() {
+      const containerRect = scroller!.getBoundingClientRect()
+      const containerCenter = containerRect.left + containerRect.width / 2
+
+      for (const card of cardRefs.current) {
+        if (!card) continue
+        const cardRect = card.getBoundingClientRect()
+        const cardCenter = cardRect.left + cardRect.width / 2
+        const distance = Math.abs(cardCenter - containerCenter)
+        const maxDistance = containerRect.width / 2 + cardRect.width / 2
+        const progress = Math.min(distance / maxDistance, 1)
+
+        const scale = 1 - progress * 0.16
+        const opacity = 1 - progress * 0.6
+        const translateY = progress * 16
+
+        card.style.transform = `scale(${scale}) translateY(${translateY}px)`
+        card.style.opacity = String(opacity)
+      }
+    }
+
+    function onScroll() {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(updateCardTransforms)
+    }
+
+    updateCardTransforms()
+    scroller.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    return () => {
+      scroller.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", onScroll)
+      cancelAnimationFrame(rafId)
+    }
   }, [])
 
   return (
@@ -71,12 +118,15 @@ export function TrendingTripsSection() {
 
         <div
           ref={scrollerRef}
-          className="scrollbar-none flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2"
+          className="scrollbar-none flex snap-x snap-mandatory gap-6 overflow-x-auto overflow-y-hidden py-4"
         >
-          {trips.map((trip) => (
+          {trips.map((trip, index) => (
             <div
               key={trip.id}
-              className="w-[82%] shrink-0 snap-start sm:w-[46%] lg:w-[31%] xl:w-[27%]"
+              ref={(el) => {
+                cardRefs.current[index] = el
+              }}
+              className="w-[82%] shrink-0 snap-start transition-[transform,opacity] duration-200 ease-out sm:w-[46%] lg:w-[31%] xl:w-[27%]"
             >
               <TripCard trip={trip} />
             </div>
