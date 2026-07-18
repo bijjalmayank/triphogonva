@@ -9,7 +9,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Primary"
-      className="glass-dark shadow-warm-lg fixed inset-x-4 bottom-4 z-50 flex items-center justify-between rounded-full px-2 py-2 lg:hidden"
+      className="glass-nav shadow-warm-lg fixed inset-x-4 bottom-4 z-50 flex items-center justify-between rounded-full px-2 py-2 lg:hidden"
     >
       {mobileNavLinks.map((link) => {
         const isActive =

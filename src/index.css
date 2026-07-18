@@ -120,6 +120,16 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
+  /* Higher-opacity variant for floating UI that must stay legible over
+     arbitrary page content (e.g. the mobile nav) rather than translucent
+     decorative cards. */
+  .glass-nav {
+    background-color: rgba(15, 33, 26, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
   .text-balance {
     text-wrap: balance;
   }
@@ -130,16 +140,5 @@
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .leaflet-tile-pane {
-    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
-  }
-  .leaflet-popup-content-wrapper,
-  .leaflet-popup-tip {
-    background: var(--color-primary);
-    color: var(--color-background);
   }
 }

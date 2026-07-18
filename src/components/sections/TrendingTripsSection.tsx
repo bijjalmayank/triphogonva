@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Container } from "@/components/common/Container"
 import { SectionHeading } from "@/components/common/SectionHeading"
@@ -14,6 +14,26 @@ export function TrendingTripsSection() {
     if (!el) return
     el.scrollBy({ left: direction * el.clientWidth * 0.85, behavior: "smooth" })
   }
+
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return
+
+    // Browsers redirect plain vertical wheel scroll into horizontal scroll
+    // for any element that only overflows horizontally. That traps normal
+    // page scrolling whenever the cursor is over this carousel — let
+    // vertical intent scroll the page instead, and keep horizontal wheel
+    // gestures (deltaX-dominant, e.g. trackpads) scrolling the carousel.
+    function onWheel(event: WheelEvent) {
+      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+        event.preventDefault()
+        window.scrollBy({ top: event.deltaY })
+      }
+    }
+
+    el.addEventListener("wheel", onWheel, { passive: false })
+    return () => el.removeEventListener("wheel", onWheel)
+  }, [])
 
   return (
     <section className="py-24">
